@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Snoopy's Flower Adventure - Feliz Cumple Niki!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #fbcfe8;
+            overflow: hidden;
+        }
+        .pixel-font {
+            font-family: 'Press Start 2P', monospace;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background: linear-gradient(to bottom, #fce7f3 0%, #fbcfe8 70%, #f472b6 100%);
+            box-shadow: 0 10px 25px -5px rgba(244, 114, 182, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        .retro-btn {
+            background: linear-gradient(to bottom, #ec4899, #be185d);
+            border-bottom: 4px solid #831843;
+            transition: transform 0.05s ease, border 0.05s ease;
+        }
+        .retro-btn:active {
+            transform: translateY(3px);
+            border-bottom: 1px solid #831843;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-between min-h-screen p-2 select-none">
+
+    <header class="w-full max-w-4xl flex justify-between items-center bg-pink-100/90 backdrop-blur-md px-4 py-2 rounded-2xl border-2 border-pink-300 shadow-sm my-1 z-10">
+        <div class="flex items-center gap-3">
+            <span class="pixel-font text-xs sm:text-sm text-pink-700 font-bold" id="levelDisplay">NIVEL 1</span>
+            <div class="flex items-center gap-1 bg-white/80 px-2 py-1 rounded-xl border border-pink-200">
+                <span class="pixel-font text-[10px] text-pink-600 font-bold">VIDAS</span>
+                <span class="pixel-font text-xs text-pink-600 font-bold" id="livesDisplay">x3</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1 bg-white/90 px-3 py-1 rounded-xl border-2 border-pink-400 shadow-inner">
+                <span class="text-base">🌸</span>
+                <span class="pixel-font text-xs sm:text-sm text-pink-800 font-bold" id="flowerDisplay">12 / 12</span>
+            </div>
+
+            <div class="flex items-center gap-1 bg-white/80 px-2 py-1 rounded-xl border border-pink-200">
+                <span class="pixel-font text-[10px] text-pink-600 font-bold">HUESOS:</span>
+                <span class="pixel-font text-xs text-pink-600 font-bold" id="boneDisplay">0/3</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative flex-1 flex items-center justify-center w-full max-w-4xl my-auto">
+        <canvas id="gameCanvas" class="rounded-3xl border-4 border-pink-400 max-w-full max-h-[70vh] aspect-[16/9] object-contain"></canvas>
+
+        <!-- Overlay Pantalla Inicio -->
+        <div id="startOverlay" class="absolute inset-0 bg-pink-900/40 backdrop-blur-md rounded-3xl flex flex-col items-center justify-center text-center p-6 text-white z-20">
+            <h1 class="pixel-font text-xl sm:text-3xl text-yellow-300 drop-shadow-[0_4px_0_rgba(190,24,93,1)] mb-4">
+                SNOOPY'S ADVENTURE 🌸
+            </h1>
+            <p class="text-base sm:text-lg mb-4 max-w-md font-medium text-pink-100">
+                Ayuda a Snoopy a juntar todos los huesos para celebrar el cumpleaños de Niki.
+            </p>
+            <div class="bg-pink-800/60 p-4 rounded-2xl border border-pink-300/40 mb-6 text-left text-xs sm:text-sm max-w-xs space-y-1">
+                <p>🌸 <b>Limite de Flores:</b> Tienes solo 12 flores para todo el juego.</p>
+                <p>☁️ <b>Nubes Oscuras:</b> Muestra su vida en pantalla (HP: 2/2).</p>
+                <p>🎯 <b>Objetivo:</b> Junta todos los huesos para desbloquear la bandera.</p>
+            </div>
+            <button id="startBtn" class="retro-btn text-white pixel-font text-sm sm:text-base px-8 py-4 rounded-2xl shadow-lg">
+                EMPEZAR JUEGO 🚀
+            </button>
+        </div>
+
+        <!-- Overlay Siguiente Nivel -->
+        <div id="nextOverlay" class="hidden absolute inset-0 bg-pink-950/70 backdrop-blur-md rounded-3xl flex flex-col items-center justify-center text-center p-6 text-white z-30">
+            <h2 id="nextTitle" class="pixel-font text-xl sm:text-3xl text-yellow-300 drop-shadow-[0_4px_0_rgba(190,24,93,1)] mb-3">
+                NIVEL COMPLETADO 🌸
+            </h2>
+            <p class="text-sm sm:text-base text-pink-100 mb-6" id="nextMsg">
+                Excelente trabajo. Preparate para el siguiente desafio.
+            </p>
+            <button id="nextLevelBtn" class="retro-btn text-white pixel-font text-sm px-6 py-3 rounded-2xl shadow-lg">
+                PASAR AL SIGUIENTE NIVEL ▶
+            </button>
+        </div>
+
+        <!-- Overlay Game Over -->
+        <div id="gameOverOverlay" class="hidden absolute inset-0 bg-red-950/80 backdrop-blur-md rounded-3xl flex flex-col items-center justify-center text-center p-6 text-white z-30">
+            <h2 class="pixel-font text-2xl sm:text-4xl text-red-400 drop-shadow-[0_4px_0_rgba(0,0,0,1)] mb-3">
+                GAME OVER
+            </h2>
+            <p class="text-sm sm:text-base text-pink-200 mb-6" id="gameOverMsg">
+                Snoopy perdio sus vidas. Intentalo de nuevo.
+            </p>
+            <button id="restartBtn" class="retro-btn text-white pixel-font text-sm px-6 py-3 rounded-2xl shadow-lg">
+                REINTENTAR NIVEL 🔄
+            </button>
+        </div>
+
+        <!-- Overlay Tarjeta Cumpleaños Niki -->
+        <div id="victoryOverlay" class="hidden absolute inset-0 bg-pink-900/80 backdrop-blur-lg rounded-3xl flex flex-col items-center justify-center text-center p-6 text-white z-40 overflow-hidden">
+            <div class="animate-pop bg-gradient-to-b from-white to-pink-100 text-pink-900 p-6 sm:p-8 rounded-3xl border-4 border-yellow-300 shadow-2xl max-w-md w-full relative">
+                <div class="text-3xl mb-2">🌸 🌸 🌸</div>
+                <h2 class="pixel-font text-lg sm:text-2xl text-pink-600 mb-2 leading-tight">
+                    FELICIDADES NIKI 🌸
+                </h2>
+                <div class="h-1 w-20 bg-pink-400 mx-auto rounded-full my-3"></div>
+                <p class="text-base sm:text-xl font-black text-purple-700 my-4 leading-snug">
+                    FELIZ CUMPLE NIKI, TE QUIERO MUCHOOOO 🌸
+                </p>
+                <p class="text-xs sm:text-sm text-pink-600 mb-6 font-medium">
+                    Completaste todos los niveles y ayudaste a Snoopy a preparar tu gran regalo especial.
+                </p>
+                <button id="playAgainBtn" class="retro-btn text-white pixel-font text-xs sm:text-sm px-6 py-3 rounded-2xl w-full shadow-md">
+                    VOLVER A JUGAR 🔁
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="w-full max-w-4xl mt-1 mb-2 px-2 z-10">
+        <div class="flex justify-between items-center gap-2 max-w-md mx-auto">
+            <div class="flex gap-2">
+                <button id="btnLeft" class="retro-btn text-white text-2xl font-bold w-14 h-14 rounded-2xl flex items-center justify-center select-none active:scale-95">
+                    ◀
+                </button>
+                <button id="btnRight" class="retro-btn text-white text-2xl font-bold w-14 h-14 rounded-2xl flex items-center justify-center select-none active:scale-95">
+                    ▶
+                </button>
+            </div>
+
+            <div class="flex gap-2">
+                <button id="btnShoot" class="retro-btn bg-gradient-to-b from-yellow-400 to-amber-600 border-amber-800 text-white text-lg font-bold px-4 h-14 rounded-2xl flex items-center justify-center gap-1 active:scale-95">
+                    🌸 <span class="pixel-font text-[10px]">FUEGO</span>
+                </button>
+                <button id="btnJump" class="retro-btn bg-gradient-to-b from-emerald-500 to-green-700 border-green-900 text-white text-2xl font-bold w-14 h-14 rounded-2xl flex items-center justify-center select-none active:scale-95">
+                    ▲
+                </button>
+            </div>
+        </div>
+        <div class="text-center text-[11px] text-pink-700 font-semibold mt-1 hidden sm:block">
+            Controles PC: Flechas / WASD para Mover/Saltar | [Espacio] o [F] para Disparar Flores
+        </div>
+    </footer>
+
+    <script>
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+            }
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+            playTone(freq, type, duration, vol = 0.1) {
+                if (!this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {}
+            }
+            jump() {
+                if (!this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(450, this.ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.15);
+                } catch(e) {}
+            }
+            shoot() {
+                this.playTone(600, 'triangle', 0.1, 0.12);
+                setTimeout(() => this.playTone(800, 'sine', 0.1, 0.08), 50);
+            }
+            hit() {
+                this.playTone(120, 'sawtooth', 0.15, 0.2);
+            }
+            collect() {
+                this.playTone(523.25, 'sine', 0.08, 0.1);
+                setTimeout(() => this.playTone(659.25, 'sine', 0.12, 0.1), 80);
+            }
+            win() {
+                const notes = [261, 329, 392, 523];
+                notes.forEach((n, i) => {
+                    setTimeout(() => this.playTone(n, 'square', 0.2, 0.15), i * 150);
+                });
+            }
+        }
+
+        const sfx = new SoundFX();
+
+        const SNOOPY_PIXEL_MAP = [
+            ".....BBBB.......",
+            "....BWWWWBB.....",
+            "...BWWWWWWWB....",
+            "..BBWWWWWWWWBB..",
+            ".BWBWWWWWBWWWWBB",
+            ".BWBWWWWWBWWWWWB",
+            ".BBWWWWWWWWWWWB.",
+            "..BWWWWWWWWBBB..",
+            "...BBWWWWBB.....",
+            ".....RRRR.......",
+            ".....BWB........",
+            "....BWB.........",
+            "...B.WB.........",
+            "..B..WB.........",
+            "..B.WWB.........",
+            "..BBWWB.........",
+            "...BBWWB........",
+            "...B..BB........",
+            "..BB...BB.......",
+            ".BBB...BBB......"
+        ];
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const V_WIDTH = 800;
+        const V_HEIGHT = 450;
+        canvas.width = V_WIDTH;
+        canvas.height = V_HEIGHT;
+
+        let gameState = 'START';
+        let currentLevelIndex = 0;
+        let flowerCount = 12;
+        let playerLives = 3;
+        let cameraX = 0;
+
+        const keys = { left: false, right: false, up: false, shoot: false };
+
+        const LEVELS = [
+            {
+                name: "NIVEL 1",
+                worldWidth: 2200,
+                bgGradient: ['#fce7f3', '#fbcfe8'],
+                requiredBones: 3,
+                platforms: [
+                    { x: 0, y: 400, w: 2400, h: 50 },
+                    { x: 250, y: 310, w: 140, h: 20 },
+                    { x: 500, y: 240, w: 150, h: 20 },
+                    { x: 800, y: 180, w: 140, h: 20 },
+                    { x: 1100, y: 280, w: 160, h: 20 },
+                    { x: 1400, y: 210, w: 150, h: 20 },
+                    { x: 1700, y: 290, w: 160, h: 20 }
+                ],
+                bones: [
+                    { x: 300, y: 270, taken: false },
+                    { x: 850, y: 140, taken: false },
+                    { x: 1450, y: 170, taken: false }
+                ],
+                clouds: [
+                    { x: 400, y: 370, minX: 300, maxX: 600, vx: 1.4, hp: 1, maxHp: 1, w: 46, h: 28 },
+                    { x: 1000, y: 370, minX: 900, maxX: 1250, vx: 1.6, hp: 1, maxHp: 1, w: 46, h: 28 },
+                    { x: 1550, y: 370, minX: 1400, maxX: 1750, vx: 1.8, hp: 1, maxHp: 1, w: 46, h: 28 }
+                ],
+                flag: { x: 2050, y: 320, w: 30, h: 80 }
+            },
+            {
+                name: "NIVEL 2",
+                worldWidth: 2600,
+                bgGradient: ['#fbcfe8', '#f472b6'],
+                requiredBones: 4,
+                platforms: [
+                    { x: 0, y: 410, w: 500, h: 40 },
+                    { x: 600, y: 340, w: 130, h: 20 },
+                    { x: 850, y: 260, w: 140, h: 20 },
+                    { x: 1100, y: 410, w: 600, h: 40 },
+                    { x: 1800, y: 310, w: 140, h: 20 },
+                    { x: 2050, y: 230, w: 150, h: 20 },
+                    { x: 2300, y: 410, w: 500, h: 40 }
+                ],
+                bones: [
+                    { x: 650, y: 300, taken: false },
+                    { x: 900, y: 220, taken: false },
+                    { x: 1850, y: 270, taken: false },
+                    { x: 2100, y: 190, taken: false }
+                ],
+                clouds: [
+                    { x: 300, y: 380, minX: 200, maxX: 450, vx: 2.0, hp: 1, maxHp: 1, w: 46, h: 28 },
+                    { x: 1200, y: 380, minX: 1120, maxX: 1500, vx: 2.2, hp: 2, maxHp: 2, w: 50, h: 32 },
+                    { x: 2400, y: 380, minX: 2320, maxX: 2650, vx: 2.2, hp: 2, maxHp: 2, w: 50, h: 32 }
+                ],
+                flag: { x: 2450, y: 330, w: 30, h: 80 }
+            },
+            {
+                name: "NIVEL 3 - DESAFIO",
+                worldWidth: 2800,
+                bgGradient: ['#f472b6', '#db2777'],
+                requiredBones: 5,
+                platforms: [
+                    { x: 0, y: 410, w: 3200, h: 40 },
+                    { x: 240, y: 320, w: 160, h: 20 },
+                    { x: 450, y: 250, w: 160, h: 20 },
+                    { x: 670, y: 250, w: 160, h: 20, isMoving: true, minX: 650, maxX: 780, vx: 0.9 },
+                    { x: 890, y: 300, w: 180, h: 20 },
+                    { x: 1120, y: 230, w: 160, h: 20 },
+                    { x: 1350, y: 310, w: 170, h: 20 },
+                    { x: 1580, y: 240, w: 160, h: 20, isMoving: true, minX: 1560, maxX: 1680, vx: 0.9 },
+                    { x: 1810, y: 290, w: 180, h: 20 },
+                    { x: 2050, y: 220, w: 180, h: 20 },
+                    { x: 2300, y: 300, w: 200, h: 20 }
+                ],
+                bones: [
+                    { x: 280, y: 280, taken: false },
+                    { x: 490, y: 210, taken: false },
+                    { x: 940, y: 260, taken: false },
+                    { x: 1390, y: 270, taken: false },
+                    { x: 2090, y: 180, taken: false }
+                ],
+                clouds: [
+                    { x: 380, y: 375, minX: 200, maxX: 550, vx: 1.8, hp: 2, maxHp: 2, w: 52, h: 32 },
+                    { x: 1000, y: 375, minX: 850, maxX: 1200, vx: 2.0, hp: 2, maxHp: 2, w: 52, h: 32 },
+                    { x: 1700, y: 375, minX: 1500, maxX: 1900, vx: 2.2, hp: 2, maxHp: 2, w: 52, h: 32 },
+                    { x: 2200, y: 375, minX: 2000, maxX: 2400, vx: 2.2, hp: 2, maxHp: 2, w: 52, h: 32 }
+                ],
+                flag: { x: 2550, y: 330, w: 30, h: 80 }
+            }
+        ];
+
+        class SnoopyPlayer {
+            constructor() {
+                this.width = 26;
+                this.height = 32;
+                this.resetPosition();
+                this.vx = 0;
+                this.vy = 0;
+                this.speed = 4.2;
+                this.gravity = 0.55;
+                this.jumpPower = -11.5;
+                this.isGrounded = false;
+                this.facingRight = true;
+                this.invulnerableTimer = 0;
+                this.walkCycle = 0;
+                this.standingPlatform = null;
+            }
+
+            resetPosition() {
+                this.x = 40;
+                this.y = 300;
+                this.vx = 0;
+                this.vy = 0;
+                this.standingPlatform = null;
+            }
+
+            update(currentLevel) {
+                if (keys.left) {
+                    this.vx = -this.speed;
+                    this.facingRight = false;
+                    this.walkCycle += 0.2;
+                } else if (keys.right) {
+                    this.vx = this.speed;
+                    this.facingRight = true;
+                    this.walkCycle += 0.2;
+                } else {
+                    this.vx = 0;
+                }
+
+                if (keys.up && this.isGrounded) {
+                    this.vy = this.jumpPower;
+                    this.isGrounded = false;
+                    this.standingPlatform = null;
+                    sfx.jump();
+                }
+
+                this.vy += this.gravity;
+                if (this.vy > 12) this.vy = 12;
+
+                if (this.isGrounded && this.standingPlatform && this.standingPlatform.isMoving && this.standingPlatform.vx) {
+                    this.x += this.standingPlatform.vx;
+                }
+
+                this.x += this.vx;
+                this.checkHorizontalCollisions(currentLevel.platforms);
+
+                this.y += this.vy;
+                this.checkVerticalCollisions(currentLevel.platforms);
+
+                if (this.x < 0) this.x = 0;
+                if (this.x > currentLevel.worldWidth - this.width) this.x = currentLevel.worldWidth - this.width;
+
+                if (this.y > V_HEIGHT + 60) {
+                    this.takeDamage();
+                }
+
+                if (this.invulnerableTimer > 0) {
+                    this.invulnerableTimer--;
+                }
+            }
+
+            checkHorizontalCollisions(platforms) {
+                for (let plat of platforms) {
+                    if (this.x + this.width > plat.x &&
+                        this.x < plat.x + plat.w &&
+                        this.y + this.height > plat.y + 4 &&
+                        this.y < plat.y + plat.h - 2) {
+                        
+                        if (this.vx > 0) {
+                            this.x = plat.x - this.width;
+                        } else if (this.vx < 0) {
+                            this.x = plat.x + plat.w;
+                        }
+                    }
+                }
+            }
+
+            checkVerticalCollisions(platforms) {
+                this.isGrounded = false;
+                let onPlat = null;
+
+                for (let plat of platforms) {
+                    if (this.x + this.width > plat.x &&
+                        this.x < plat.x + plat.w) {
+
+                        if (this.vy >= 0 && (this.y + this.height - this.vy) <= plat.y + 12 && (this.y + this.height) >= plat.y) {
+                            this.y = plat.y - this.height;
+                            this.vy = 0;
+                            this.isGrounded = true;
+                            onPlat = plat;
+                        } else if (this.vy < 0 && this.y < plat.y + plat.h && this.y > plat.y) {
+                            this.y = plat.y + plat.h;
+                            this.vy = 0;
+                        }
+                    }
+                }
+                this.standingPlatform = onPlat;
+            }
+
+            takeDamage() {
+                if (this.invulnerableTimer > 0) return;
+
+                playerLives--;
+                sfx.hit();
+                updateHUD();
+
+                if (playerLives <= 0) {
+                    gameState = 'GAMEOVER';
+                    document.getElementById('gameOverOverlay').classList.remove('hidden');
+                } else {
+                    this.invulnerableTimer = 60;
+                    this.resetPosition();
+                }
+            }
+
+            draw(ctx) {
+                if (this.invulnerableTimer % 6 > 3) return;
+
+                ctx.save();
+                ctx.translate(Math.floor(this.x), Math.floor(this.y));
+
+                if (!this.facingRight) {
+                    ctx.translate(this.width, 0);
+                    ctx.scale(-1, 1);
+                }
+
+                const pixelSize = 1.6;
+                for (let r = 0; r < SNOOPY_PIXEL_MAP.length; r++) {
+                    const row = SNOOPY_PIXEL_MAP[r];
+                    for (let c = 0; c < row.length; c++) {
+                        const char = row[c];
+                        if (char === '.') continue;
+
+                        if (char === 'B') ctx.fillStyle = '#18181b';
+                        else if (char === 'W') ctx.fillStyle = '#ffffff';
+                        else if (char === 'R') ctx.fillStyle = '#ef4444';
+
+                        let offsetY = 0;
+                        if (r >= 16 && Math.sin(this.walkCycle) > 0 && Math.abs(this.vx) > 0.1) {
+                            offsetY = (c % 2 === 0) ? -1 : 1;
+                        }
+
+                        ctx.fillRect(c * pixelSize, r * pixelSize + offsetY, pixelSize, pixelSize);
+                    }
+                }
+
+                ctx.restore();
+            }
+        }
+
+        class FlowerProjectile {
+            constructor(x, y, facingRight) {
+                this.x = x;
+                this.y = y;
+                this.vx = facingRight ? 8 : -8;
+                this.radius = 8;
+                this.active = true;
+                this.rotation = 0;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.rotation += 0.2;
+
+                if (this.x < cameraX - 50 || this.x > cameraX + V_WIDTH + 50) {
+                    this.active = false;
+                }
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+
+                ctx.fillStyle = '#f472b6';
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i * Math.PI * 2) / 5;
+                    const px = Math.cos(angle) * 5;
+                    const py = Math.sin(angle) * 5;
+                    ctx.beginPath();
+                    ctx.arc(px, py, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.fillStyle = '#facc15';
+                ctx.beginPath();
+                ctx.arc(0, 0, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        let player = new SnoopyPlayer();
+        let projectiles = [];
+        let particles = [];
+
+        function spawnParticles(x, y, color) {
+            for (let i = 0; i < 8; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    life: 20,
+                    color: color
+                });
+            }
+        }
+
+        function updateGame() {
+            if (gameState !== 'PLAYING') return;
+
+            const lvl = LEVELS[currentLevelIndex];
+
+            player.update(lvl);
+
+            cameraX += (player.x - V_WIDTH / 3 - cameraX) * 0.1;
+            if (cameraX < 0) cameraX = 0;
+            if (cameraX > lvl.worldWidth - V_WIDTH) cameraX = lvl.worldWidth - V_WIDTH;
+
+            lvl.platforms.forEach(p => {
+                if (p.isMoving) {
+                    if (p.vx) {
+                        p.x += p.vx;
+                        if (p.x <= p.minX || p.x + p.w >= p.maxX) p.vx *= -1;
+                    }
+                }
+            });
+
+            projectiles.forEach(p => p.update());
+            projectiles = projectiles.filter(p => p.active);
+
+            lvl.clouds.forEach(cloud => {
+                if (cloud.hp <= 0) return;
+
+                cloud.x += cloud.vx;
+                if (cloud.x <= cloud.minX || cloud.x + cloud.w >= cloud.maxX) {
+                    cloud.vx *= -1;
+                }
+
+                if (player.x + player.width - 4 > cloud.x &&
+                    player.x + 4 < cloud.x + cloud.w &&
+                    player.y + player.height - 4 > cloud.y &&
+                    player.y + 4 < cloud.y + cloud.h) {
+                    player.takeDamage();
+                }
+
+                projectiles.forEach(proj => {
+                    if (proj.active &&
+                        proj.x > cloud.x && proj.x < cloud.x + cloud.w &&
+                        proj.y > cloud.y && proj.y < cloud.y + cloud.h) {
+                        
+                        proj.active = false;
+                        cloud.hp--;
+                        sfx.hit();
+                        spawnParticles(proj.x, proj.y, '#f472b6');
+
+                        if (cloud.hp <= 0) {
+                            spawnParticles(cloud.x + cloud.w/2, cloud.y + cloud.h/2, '#4b5563');
+                        }
+                    }
+                });
+            });
+
+            let collectedCount = 0;
+            lvl.bones.forEach(b => {
+                if (!b.taken) {
+                    if (player.x + player.width > b.x - 12 &&
+                        player.x < b.x + 12 &&
+                        player.y + player.height > b.y - 12 &&
+                        player.y < b.y + 12) {
+                        
+                        b.taken = true;
+                        sfx.collect();
+                        spawnParticles(b.x, b.y, '#fef08a');
+                    }
+                } else {
+                    collectedCount++;
+                }
+            });
+
+            document.getElementById('boneDisplay').textContent = `${collectedCount}/${lvl.requiredBones}`;
+
+            const flag = lvl.flag;
+            const allBonesCollected = collectedCount >= lvl.requiredBones;
+            if (allBonesCollected &&
+                player.x + player.width > flag.x &&
+                player.x < flag.x + flag.w &&
+                player.y + player.height > flag.y &&
+                player.y < flag.y + flag.h) {
+
+                sfx.win();
+                if (currentLevelIndex < LEVELS.length - 1) {
+                    gameState = 'LEVEL_CLEAR';
+                    document.getElementById('nextTitle').textContent = `NIVEL ${currentLevelIndex + 1} COMPLETADO 🌸`;
+                    document.getElementById('nextMsg').textContent = `Snoopy junta mas fuerzas para el Nivel ${currentLevelIndex + 2}`;
+                    document.getElementById('nextOverlay').classList.remove('hidden');
+                } else {
+                    gameState = 'VICTORY';
+                    document.getElementById('victoryOverlay').classList.remove('hidden');
+                }
+            }
+
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+            });
+            particles = particles.filter(p => p.life > 0);
+        }
+
+        function drawGame() {
+            const lvl = LEVELS[currentLevelIndex];
+
+            const bgGrad = ctx.createLinearGradient(0, 0, 0, V_HEIGHT);
+            bgGrad.addColorStop(0, lvl.bgGradient[0]);
+            bgGrad.addColorStop(1, lvl.bgGradient[1]);
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, V_WIDTH, V_HEIGHT);
+
+            ctx.save();
+            ctx.translate(-Math.floor(cameraX), 0);
+
+            lvl.platforms.forEach(p => {
+                ctx.fillStyle = '#a8e6cf';
+                ctx.fillRect(p.x, p.y, p.w, p.h);
+
+                ctx.fillStyle = '#81c784';
+                ctx.fillRect(p.x, p.y + p.h - 3, p.w, 3);
+                for (let x = p.x; x < p.x + p.w; x += 8) {
+                    ctx.fillRect(x, p.y, 4, 3);
+                    ctx.fillRect(x + 2, p.y + 8, 3, 3);
+                }
+            });
+
+            const flag = lvl.flag;
+            const allBonesCollected = lvl.bones.filter(b => b.taken).length >= lvl.requiredBones;
+
+            ctx.fillStyle =
