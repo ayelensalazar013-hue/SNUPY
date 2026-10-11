@@ -231,10 +231,10 @@
             "..BWWWWWWWWBBB..",
             "...BBWWWWBB.....",
             ".....RRRR.......",
-            ".....BWWB........",
-            "....BWWWWB.......",
-            "...B.WWWWWB......",
-            "..B..WWWWWWB.....",
+            ".....BWWB.......",
+            "....BWWWB.......",
+            "...B.WWWWB......",
+            "..B..WWWWWB.....",
             "..B.WWWWWWWB....",
             "..BBWWWWWWWB....",
             "...BBWWWWWB.....",
@@ -314,40 +314,45 @@
                 flag: { x: 2450, y: 330, w: 30, h: 80 }
             },
             {
-                // NIVEL 3 MÁS COMPLICADO Y DESAFIANTE
                 name: "NIVEL 3 - DESAFIO EXTREMO",
-                worldWidth: 3000,
+                worldWidth: 3200,
                 bgGradient: ['#f472b6', '#db2777'],
                 requiredBones: 5,
                 platforms: [
-                    { x: 0, y: 410, w: 3400, h: 40 },
-                    { x: 220, y: 320, w: 130, h: 20 },
-                    { x: 420, y: 240, w: 120, h: 20 },
-                    { x: 620, y: 240, w: 140, h: 20, isMoving: true, minX: 580, maxX: 750, vx: 1.5 },
-                    { x: 850, y: 310, w: 130, h: 20 },
-                    { x: 1080, y: 220, w: 120, h: 20 },
-                    { x: 1300, y: 300, w: 130, h: 20 },
-                    { x: 1520, y: 220, w: 130, h: 20, isMoving: true, minX: 1480, maxX: 1650, vx: 1.6 },
-                    { x: 1760, y: 280, w: 140, h: 20 },
-                    { x: 2000, y: 200, w: 130, h: 20 },
-                    { x: 2250, y: 290, w: 150, h: 20 },
-                    { x: 2500, y: 210, w: 140, h: 20 }
+                    { x: 0, y: 410, w: 250, h: 40 },
+                    { x: 380, y: 410, w: 180, h: 40 },
+                    { x: 700, y: 410, w: 160, h: 40 },
+                    { x: 1020, y: 410, w: 200, h: 40 },
+                    { x: 1380, y: 410, w: 180, h: 40 },
+                    { x: 1720, y: 410, w: 160, h: 40 },
+                    { x: 2080, y: 410, w: 200, h: 40 },
+                    { x: 2440, y: 410, w: 180, h: 40 },
+                    { x: 2800, y: 410, w: 400, h: 40 },
+
+                    { x: 250, y: 320, w: 100, h: 20 },
+                    { x: 580, y: 260, w: 90, h: 20, isMoving: true, minX: 550, maxX: 680, vx: 1.8 },
+                    { x: 880, y: 300, w: 100, h: 20 },
+                    { x: 1240, y: 240, w: 90, h: 20, isMoving: true, minX: 1200, maxX: 1350, vx: 2.0 },
+                    { x: 1580, y: 290, w: 100, h: 20 },
+                    { x: 1900, y: 220, w: 90, h: 20, isMoving: true, minX: 1860, maxX: 2020, vx: 2.2 },
+                    { x: 2300, y: 290, w: 100, h: 20 },
+                    { x: 2640, y: 220, w: 110, h: 20 }
                 ],
                 bones: [
-                    { x: 260, y: 280, taken: false },
-                    { x: 460, y: 190, taken: false },
-                    { x: 1120, y: 170, taken: false },
-                    { x: 1800, y: 230, taken: false },
-                    { x: 2540, y: 160, taken: false }
+                    { x: 290, y: 280, taken: false },
+                    { x: 620, y: 210, taken: false },
+                    { x: 1280, y: 190, taken: false },
+                    { x: 1940, y: 170, taken: false },
+                    { x: 2690, y: 170, taken: false }
                 ],
                 clouds: [
-                    { x: 300, y: 375, minX: 150, maxX: 500, vx: 2.6, hp: 2, maxHp: 2, w: 52, h: 32 },
-                    { x: 950, y: 375, minX: 750, maxX: 1200, vx: 2.8, hp: 2, maxHp: 2, w: 52, h: 32 },
-                    { x: 1600, y: 375, minX: 1400, maxX: 1850, vx: 3.0, hp: 2, maxHp: 2, w: 52, h: 32 },
-                    { x: 2200, y: 375, minX: 1950, maxX: 2450, vx: 3.2, hp: 2, maxHp: 2, w: 52, h: 32 },
-                    { x: 2600, y: 375, minX: 2400, maxX: 2850, vx: 3.4, hp: 2, maxHp: 2, w: 52, h: 32 }
+                    { x: 300, y: 350, minX: 180, maxX: 500, vx: 2.8, hp: 2, maxHp: 2, w: 52, h: 32 },
+                    { x: 900, y: 350, minX: 750, maxX: 1150, vx: 3.0, hp: 2, maxHp: 2, w: 52, h: 32 },
+                    { x: 1500, y: 350, minX: 1300, maxX: 1750, vx: 3.2, hp: 2, maxHp: 2, w: 52, h: 32 },
+                    { x: 2100, y: 350, minX: 1900, maxX: 2380, vx: 3.4, hp: 2, maxHp: 2, w: 52, h: 32 },
+                    { x: 2700, y: 350, minX: 2500, maxX: 2950, vx: 3.6, hp: 2, maxHp: 2, w: 52, h: 32 }
                 ],
-                flag: { x: 2750, y: 330, w: 30, h: 80 }
+                flag: { x: 2980, y: 330, w: 30, h: 80 }
             }
         ];
 
