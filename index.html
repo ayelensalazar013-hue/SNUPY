@@ -256,13 +256,16 @@
         let flowerCount = 12;
         let playerLives = 3;
         let cameraX = 0;
+        let cameraY = 0;
 
         const keys = { left: false, right: false, up: false, shoot: false };
 
         const LEVELS = [
             {
                 name: "NIVEL 1",
+                isVertical: false,
                 worldWidth: 2200,
+                worldHeight: 450,
                 bgGradient: ['#fce7f3', '#fbcfe8'],
                 requiredBones: 3,
                 platforms: [
@@ -288,7 +291,9 @@
             },
             {
                 name: "NIVEL 2",
+                isVertical: false,
                 worldWidth: 2600,
+                worldHeight: 450,
                 bgGradient: ['#fbcfe8', '#f472b6'],
                 requiredBones: 4,
                 platforms: [
@@ -314,45 +319,50 @@
                 flag: { x: 2450, y: 330, w: 30, h: 80 }
             },
             {
-                name: "NIVEL 3 - DESAFIO EXTREMO",
-                worldWidth: 3200,
-                bgGradient: ['#f472b6', '#db2777'],
+                // NIVEL 3: DESAFÍO VERTICAL (LA TORRE DE ESCALADA)
+                name: "NIVEL 3 - TORRE VERTICAL",
+                isVertical: true,
+                worldWidth: 800,
+                worldHeight: 1800,
+                bgGradient: ['#831843', '#db2777'],
                 requiredBones: 5,
                 platforms: [
-                    { x: 0, y: 410, w: 250, h: 40 },
-                    { x: 380, y: 410, w: 180, h: 40 },
-                    { x: 700, y: 410, w: 160, h: 40 },
-                    { x: 1020, y: 410, w: 200, h: 40 },
-                    { x: 1380, y: 410, w: 180, h: 40 },
-                    { x: 1720, y: 410, w: 160, h: 40 },
-                    { x: 2080, y: 410, w: 200, h: 40 },
-                    { x: 2440, y: 410, w: 180, h: 40 },
-                    { x: 2800, y: 410, w: 400, h: 40 },
+                    // Base inicial en el fondo
+                    { x: 200, y: 1740, w: 400, h: 40 },
 
-                    { x: 250, y: 320, w: 100, h: 20 },
-                    { x: 580, y: 260, w: 90, h: 20, isMoving: true, minX: 550, maxX: 680, vx: 1.8 },
-                    { x: 880, y: 300, w: 100, h: 20 },
-                    { x: 1240, y: 240, w: 90, h: 20, isMoving: true, minX: 1200, maxX: 1350, vx: 2.0 },
-                    { x: 1580, y: 290, w: 100, h: 20 },
-                    { x: 1900, y: 220, w: 90, h: 20, isMoving: true, minX: 1860, maxX: 2020, vx: 2.2 },
-                    { x: 2300, y: 290, w: 100, h: 20 },
-                    { x: 2640, y: 220, w: 110, h: 20 }
+                    // Pisos en zigzag hacia la cima
+                    { x: 80,  y: 1620, w: 180, h: 20 },
+                    { x: 540, y: 1520, w: 180, h: 20 },
+                    { x: 320, y: 1410, w: 160, h: 20, isMoving: true, minX: 180, maxX: 480, vx: 2.0 },
+                    
+                    { x: 100, y: 1290, w: 170, h: 20 },
+                    { x: 520, y: 1180, w: 180, h: 20 },
+                    { x: 280, y: 1060, w: 150, h: 20, isMoving: true, minX: 150, maxX: 500, vx: 2.4 },
+
+                    { x: 80,  y: 940,  w: 180, h: 20 },
+                    { x: 540, y: 820,  w: 180, h: 20 },
+                    { x: 310, y: 700,  w: 160, h: 20, isMoving: true, minX: 120, maxX: 520, vx: 2.6 },
+
+                    { x: 120, y: 580,  w: 180, h: 20 },
+                    { x: 500, y: 460,  w: 180, h: 20 },
+                    
+                    // Cima de la Torre
+                    { x: 250, y: 320,  w: 300, h: 30 }
                 ],
                 bones: [
-                    { x: 290, y: 280, taken: false },
-                    { x: 620, y: 210, taken: false },
-                    { x: 1280, y: 190, taken: false },
-                    { x: 1940, y: 170, taken: false },
-                    { x: 2690, y: 170, taken: false }
+                    { x: 160, y: 1580, taken: false },
+                    { x: 620, y: 1480, taken: false },
+                    { x: 180, y: 1250, taken: false },
+                    { x: 600, y: 780,  taken: false },
+                    { x: 200, y: 540,  taken: false }
                 ],
                 clouds: [
-                    { x: 300, y: 350, minX: 180, maxX: 500, vx: 2.8, hp: 2, maxHp: 2, w: 52, h: 32 },
-                    { x: 900, y: 350, minX: 750, maxX: 1150, vx: 3.0, hp: 2, maxHp: 2, w: 52, h: 32 },
-                    { x: 1500, y: 350, minX: 1300, maxX: 1750, vx: 3.2, hp: 2, maxHp: 2, w: 52, h: 32 },
-                    { x: 2100, y: 350, minX: 1900, maxX: 2380, vx: 3.4, hp: 2, maxHp: 2, w: 52, h: 32 },
-                    { x: 2700, y: 350, minX: 2500, maxX: 2950, vx: 3.6, hp: 2, maxHp: 2, w: 52, h: 32 }
+                    { x: 300, y: 1570, minX: 120, maxX: 680, vx: 2.8, hp: 2, maxHp: 2, w: 52, h: 32 },
+                    { x: 200, y: 1240, minX: 100, maxX: 650, vx: 3.0, hp: 2, maxHp: 2, w: 52, h: 32 },
+                    { x: 400, y: 900,  minX: 150, maxX: 650, vx: 3.2, hp: 2, maxHp: 2, w: 52, h: 32 },
+                    { x: 250, y: 640,  minX: 100, maxX: 680, vx: 3.5, hp: 2, maxHp: 2, w: 52, h: 32 }
                 ],
-                flag: { x: 2980, y: 330, w: 30, h: 80 }
+                flag: { x: 380, y: 240, w: 30, h: 80 }
             }
         ];
 
@@ -374,8 +384,14 @@
             }
 
             resetPosition() {
-                this.x = 40;
-                this.y = 300;
+                const lvl = LEVELS[currentLevelIndex];
+                if (lvl && lvl.isVertical) {
+                    this.x = 380;
+                    this.y = 1680;
+                } else {
+                    this.x = 40;
+                    this.y = 300;
+                }
                 this.vx = 0;
                 this.vy = 0;
                 this.standingPlatform = null;
@@ -417,7 +433,8 @@
                 if (this.x < 0) this.x = 0;
                 if (this.x > currentLevel.worldWidth - this.width) this.x = currentLevel.worldWidth - this.width;
 
-                if (this.y > V_HEIGHT + 60) {
+                const bottomLimit = currentLevel.isVertical ? currentLevel.worldHeight + 60 : V_HEIGHT + 60;
+                if (this.y > bottomLimit) {
                     this.takeDamage();
                 }
 
@@ -581,9 +598,17 @@
 
             player.update(lvl);
 
-            cameraX += (player.x - V_WIDTH / 3 - cameraX) * 0.1;
-            if (cameraX < 0) cameraX = 0;
-            if (cameraX > lvl.worldWidth - V_WIDTH) cameraX = lvl.worldWidth - V_WIDTH;
+            if (lvl.isVertical) {
+                cameraX = 0;
+                cameraY += (player.y - V_HEIGHT / 2 - cameraY) * 0.1;
+                if (cameraY < 0) cameraY = 0;
+                if (cameraY > lvl.worldHeight - V_HEIGHT) cameraY = lvl.worldHeight - V_HEIGHT;
+            } else {
+                cameraY = 0;
+                cameraX += (player.x - V_WIDTH / 3 - cameraX) * 0.1;
+                if (cameraX < 0) cameraX = 0;
+                if (cameraX > lvl.worldWidth - V_WIDTH) cameraX = lvl.worldWidth - V_WIDTH;
+            }
 
             lvl.platforms.forEach(p => {
                 if (p.isMoving) {
@@ -686,7 +711,7 @@
             ctx.fillRect(0, 0, V_WIDTH, V_HEIGHT);
 
             ctx.save();
-            ctx.translate(-Math.floor(cameraX), 0);
+            ctx.translate(-Math.floor(cameraX), -Math.floor(cameraY));
 
             lvl.platforms.forEach(p => {
                 ctx.fillStyle = '#a8e6cf';
@@ -798,6 +823,7 @@
             currentLevelIndex = index;
             player.resetPosition();
             cameraX = 0;
+            cameraY = LEVELS[index].isVertical ? LEVELS[index].worldHeight - V_HEIGHT : 0;
             
             LEVELS[index].bones.forEach(b => b.taken = false);
             LEVELS[index].clouds.forEach(c => c.hp = c.maxHp);
