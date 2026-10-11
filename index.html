@@ -81,11 +81,11 @@
             </p>
             <div class="bg-pink-800/60 p-4 rounded-2xl border border-pink-300/40 mb-6 text-left text-xs sm:text-sm max-w-xs space-y-1">
                 <p>🌸 <b>Limite de Flores:</b> Tienes solo 12 flores para todo el juego.</p>
-                <p>☁️ <b>Nubes Oscuras:</b> Muestra su vida en pantalla (HP: 2/2).</p>
-                <p>🎯 <b>Objetivo:</b> Junta todos los huesos para desbloquear la bandera.</p>
+                <p>🌸 <b>Nubes Oscuras:</b> Muestra su vida en pantalla (HP: 2/2).</p>
+                <p>🌸 <b>Objetivo:</b> Junta todos los huesos para desbloquear la bandera.</p>
             </div>
-            <button id="startBtn" class="retro-btn text-white pixel-font text-sm sm:text-base px-8 py-4 rounded-2xl shadow-lg">
-                EMPEZAR JUEGO 🚀
+            <button id="startBtn" class="retro-btn text-white pixel-font text-sm sm:text-base px-8 py-4 rounded-2xl shadow-lg cursor-pointer">
+                EMPEZAR JUEGO 🌸
             </button>
         </div>
 
@@ -97,8 +97,8 @@
             <p class="text-sm sm:text-base text-pink-100 mb-6" id="nextMsg">
                 Excelente trabajo. Preparate para el siguiente desafio.
             </p>
-            <button id="nextLevelBtn" class="retro-btn text-white pixel-font text-sm px-6 py-3 rounded-2xl shadow-lg">
-                PASAR AL SIGUIENTE NIVEL ▶
+            <button id="nextLevelBtn" class="retro-btn text-white pixel-font text-sm px-6 py-3 rounded-2xl shadow-lg cursor-pointer">
+                PASAR AL SIGUIENTE NIVEL 🌸
             </button>
         </div>
 
@@ -110,8 +110,8 @@
             <p class="text-sm sm:text-base text-pink-200 mb-6" id="gameOverMsg">
                 Snoopy perdio sus vidas. Intentalo de nuevo.
             </p>
-            <button id="restartBtn" class="retro-btn text-white pixel-font text-sm px-6 py-3 rounded-2xl shadow-lg">
-                REINTENTAR NIVEL 🔄
+            <button id="restartBtn" class="retro-btn text-white pixel-font text-sm px-6 py-3 rounded-2xl shadow-lg cursor-pointer">
+                REINTENTAR NIVEL 🌸
             </button>
         </div>
 
@@ -129,8 +129,8 @@
                 <p class="text-xs sm:text-sm text-pink-600 mb-6 font-medium">
                     Completaste todos los niveles y ayudaste a Snoopy a preparar tu gran regalo especial.
                 </p>
-                <button id="playAgainBtn" class="retro-btn text-white pixel-font text-xs sm:text-sm px-6 py-3 rounded-2xl w-full shadow-md">
-                    VOLVER A JUGAR 🔁
+                <button id="playAgainBtn" class="retro-btn text-white pixel-font text-xs sm:text-sm px-6 py-3 rounded-2xl w-full shadow-md cursor-pointer">
+                    VOLVER A JUGAR 🌸
                 </button>
             </div>
         </div>
@@ -223,6 +223,7 @@
 
         const sfx = new SoundFX();
 
+        // Snoopy con la pancita más prominente y redondeada
         const SNOOPY_PIXEL_MAP = [
             ".....BBBB.......",
             "....BWWWWBB.....",
@@ -235,13 +236,13 @@
             "...BBWWWWBB.....",
             ".....RRRR.......",
             ".....BWB........",
-            "....BWB.........",
-            "...B.WB.........",
-            "..B..WB.........",
-            "..B.WWB.........",
-            "..BBWWB.........",
-            "...BBWWB........",
-            "...B..BB........",
+            "....BWWWWB......",
+            "...B.WWWWWB.....",
+            "..B..WWWWWB.....",
+            "..B.WWWWWWWB....",
+            "..BBWWWWWWWB....",
+            "...BBWWWWWB.....",
+            "...B..BBBB......",
             "..BB...BB.......",
             ".BBB...BBB......"
         ];
@@ -698,4 +699,229 @@
             const flag = lvl.flag;
             const allBonesCollected = lvl.bones.filter(b => b.taken).length >= lvl.requiredBones;
 
-            ctx.fillStyle =
+            ctx.fillStyle = '#8d6e63';
+            ctx.fillRect(flag.x + 5, flag.y, 4, flag.h);
+
+            ctx.fillStyle = allBonesCollected ? '#ec4899' : '#94a3b8';
+            ctx.beginPath();
+            ctx.moveTo(flag.x + 9, flag.y);
+            ctx.lineTo(flag.x + 30, flag.y + 12);
+            ctx.lineTo(flag.x + 9, flag.y + 24);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 9px sans-serif';
+            ctx.fillText(`N${currentLevelIndex + 1}`, flag.x + 11, flag.y + 16);
+
+            lvl.bones.forEach(b => {
+                if (!b.taken) {
+                    ctx.save();
+                    ctx.translate(b.x, b.y);
+                    ctx.fillStyle = '#ffffff';
+                    
+                    ctx.fillRect(-8, -3, 16, 6);
+                    ctx.beginPath();
+                    ctx.arc(-8, -3, 4, 0, Math.PI*2);
+                    ctx.arc(-8, 3, 4, 0, Math.PI*2);
+                    ctx.arc(8, -3, 4, 0, Math.PI*2);
+                    ctx.arc(8, 3, 4, 0, Math.PI*2);
+                    ctx.fill();
+
+                    ctx.restore();
+                }
+            });
+
+            lvl.clouds.forEach(cloud => {
+                if (cloud.hp <= 0) return;
+
+                ctx.fillStyle = cloud.maxHp === 2 ? '#1f2937' : '#37474f';
+
+                ctx.beginPath();
+                ctx.arc(cloud.x + 12, cloud.y + 18, 12, 0, Math.PI * 2);
+                ctx.arc(cloud.x + 25, cloud.y + 12, 15, 0, Math.PI * 2);
+                ctx.arc(cloud.x + 38, cloud.y + 18, 12, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillRect(cloud.x + 10, cloud.y + 16, 30, 12);
+
+                ctx.fillStyle = '#ef4444';
+                ctx.fillRect(cloud.x + 18, cloud.y + 14, 3, 5);
+                ctx.fillRect(cloud.x + 30, cloud.y + 14, 3, 5);
+
+                if (cloud.maxHp === 2) {
+                    ctx.save();
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                    ctx.strokeStyle = '#be185d';
+                    ctx.lineWidth = 1;
+                    
+                    const badgeX = cloud.x + (cloud.w / 2) - 22;
+                    const badgeY = cloud.y - 18;
+                    
+                    ctx.beginPath();
+                    ctx.roundRect(badgeX, badgeY, 44, 16, 8);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.font = 'bold 9px sans-serif';
+                    ctx.fillStyle = '#be185d';
+                    ctx.textAlign = 'center';
+                    const hpText = cloud.hp === 2 ? "HP: 2/2" : "HP: 1/2";
+                    ctx.fillText(hpText, cloud.x + (cloud.w / 2), badgeY + 11);
+
+                    ctx.restore();
+                }
+            });
+
+            player.draw(ctx);
+
+            projectiles.forEach(p => p.draw(ctx));
+
+            particles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, 3, 3);
+            });
+
+            ctx.restore();
+        }
+
+        function updateHUD() {
+            document.getElementById('levelDisplay').textContent = LEVELS[currentLevelIndex].name;
+            document.getElementById('livesDisplay').textContent = `x${playerLives}`;
+            document.getElementById('flowerDisplay').textContent = `${flowerCount} / 12`;
+        }
+
+        function startLevel(index) {
+            currentLevelIndex = index;
+            player.resetPosition();
+            cameraX = 0;
+            
+            LEVELS[index].bones.forEach(b => b.taken = false);
+            LEVELS[index].clouds.forEach(c => c.hp = c.maxHp);
+
+            projectiles = [];
+            particles = [];
+            updateHUD();
+        }
+
+        function resetWholeGame() {
+            flowerCount = 12;
+            playerLives = 3;
+            currentLevelIndex = 0;
+            startLevel(0);
+        }
+
+        function fireFlower() {
+            if (gameState !== 'PLAYING') return;
+
+            if (flowerCount > 0) {
+                flowerCount--;
+                updateHUD();
+                sfx.shoot();
+
+                const spawnX = player.facingRight ? player.x + player.width + 4 : player.x - 4;
+                const spawnY = player.y + 12;
+                projectiles.push(new FlowerProjectile(spawnX, spawnY, player.facingRight));
+            }
+        }
+
+        function setupControls() {
+            window.addEventListener('keydown', e => {
+                sfx.init();
+                if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
+                if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
+                if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') keys.up = true;
+                if (e.code === 'KeyF' || e.code === 'KeyX' || e.code === 'KeyZ') {
+                    if (!keys.shoot) {
+                        fireFlower();
+                        keys.shoot = true;
+                    }
+                }
+            });
+
+            window.addEventListener('keyup', e => {
+                if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
+                if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
+                if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') keys.up = false;
+                if (e.code === 'KeyF' || e.code === 'KeyX' || e.code === 'KeyZ') keys.shoot = false;
+            });
+
+            const bindTouchBtn = (id, onPress, onRelease) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const handleStart = (e) => {
+                    e.preventDefault();
+                    sfx.init();
+                    onPress();
+                };
+                const handleEnd = (e) => {
+                    e.preventDefault();
+                    if (onRelease) onRelease();
+                };
+                el.addEventListener('touchstart', handleStart, { passive: false });
+                el.addEventListener('touchend', handleEnd, { passive: false });
+                el.addEventListener('mousedown', handleStart);
+                el.addEventListener('mouseup', handleEnd);
+            };
+
+            bindTouchBtn('btnLeft', () => keys.left = true, () => keys.left = false);
+            bindTouchBtn('btnRight', () => keys.right = true, () => keys.right = false);
+            bindTouchBtn('btnJump', () => keys.up = true, () => keys.up = false);
+            bindTouchBtn('btnShoot', () => fireFlower(), null);
+
+            const startBtn = document.getElementById('startBtn');
+            if (startBtn) {
+                startBtn.onclick = () => {
+                    sfx.init();
+                    document.getElementById('startOverlay').classList.add('hidden');
+                    resetWholeGame();
+                    gameState = 'PLAYING';
+                };
+            }
+
+            const nextLevelBtn = document.getElementById('nextLevelBtn');
+            if (nextLevelBtn) {
+                nextLevelBtn.onclick = () => {
+                    sfx.init();
+                    document.getElementById('nextOverlay').classList.add('hidden');
+                    currentLevelIndex++;
+                    startLevel(currentLevelIndex);
+                    gameState = 'PLAYING';
+                };
+            }
+
+            const restartBtn = document.getElementById('restartBtn');
+            if (restartBtn) {
+                restartBtn.onclick = () => {
+                    sfx.init();
+                    document.getElementById('gameOverOverlay').classList.add('hidden');
+                    playerLives = 3;
+                    startLevel(currentLevelIndex);
+                    gameState = 'PLAYING';
+                };
+            }
+
+            const playAgainBtn = document.getElementById('playAgainBtn');
+            if (playAgainBtn) {
+                playAgainBtn.onclick = () => {
+                    sfx.init();
+                    document.getElementById('victoryOverlay').classList.add('hidden');
+                    resetWholeGame();
+                    gameState = 'PLAYING';
+                };
+            }
+        }
+
+        function gameLoop() {
+            updateGame();
+            drawGame();
+            requestAnimationFrame(gameLoop);
+        }
+
+        window.onload = function() {
+            setupControls();
+            startLevel(0);
+            gameLoop();
+        };
+    </script>
+</body>
+</html>
