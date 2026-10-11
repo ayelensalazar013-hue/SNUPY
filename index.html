@@ -314,13 +314,13 @@
                 flag: { x: 2450, y: 330, w: 30, h: 80 }
             },
             {
-                // NIVEL 3 BASADO EN LAS IMÁGENES: PISO CON ESPACIOS Y SOLO 2 PLATAFORMAS MÓVILES
+                // NIVEL 3 CON ALTURAS REAJUSTADAS PARA EL SALTO DE SNOOPY
                 name: "NIVEL 3 - DESAFIO",
                 worldWidth: 2800,
                 bgGradient: ['#f472b6', '#db2777'],
                 requiredBones: 5,
                 platforms: [
-                    // Pisos en la base con espacios entre ellos
+                    // Pisos en la base
                     { x: 0, y: 410, w: 220, h: 40 },
                     { x: 350, y: 410, w: 250, h: 40 },
                     { x: 750, y: 410, w: 300, h: 40 },
@@ -329,27 +329,27 @@
                     { x: 2000, y: 410, w: 260, h: 40 },
                     { x: 2400, y: 410, w: 450, h: 40 },
 
-                    // Plataformas fijas elevadas (como en la captura)
-                    { x: 120, y: 290, w: 140, h: 20 },
-                    { x: 270, y: 220, w: 130, h: 20 },
-                    { x: 500, y: 280, w: 140, h: 20 },
-                    { x: 820, y: 230, w: 150, h: 20 },
-                    { x: 1000, y: 300, w: 140, h: 20 },
-                    { x: 1300, y: 220, w: 150, h: 20 },
-                    { x: 1720, y: 280, w: 140, h: 20 },
-                    { x: 2100, y: 230, w: 150, h: 20 },
-                    { x: 2500, y: 290, w: 160, h: 20 },
+                    // Plataformas fidedignas alcanzables en el aire
+                    { x: 110, y: 320, w: 140, h: 20 }, // Fácil de subir desde el primer piso
+                    { x: 270, y: 250, w: 130, h: 20 }, // Segundo escalón
+                    { x: 500, y: 310, w: 140, h: 20 },
+                    { x: 820, y: 270, w: 150, h: 20 },
+                    { x: 1000, y: 320, w: 140, h: 20 },
+                    { x: 1300, y: 260, w: 150, h: 20 },
+                    { x: 1720, y: 310, w: 140, h: 20 },
+                    { x: 2100, y: 260, w: 150, h: 20 },
+                    { x: 2500, y: 310, w: 160, h: 20 },
 
                     // SOLO 2 PLATAFORMAS QUE SE MUEVEN
-                    { x: 640, y: 210, w: 130, h: 20, isMoving: true, minX: 620, maxX: 780, vx: 1.5 },
-                    { x: 1500, y: 210, w: 130, h: 20, isMoving: true, minX: 1460, maxX: 1620, vx: 1.6 }
+                    { x: 640, y: 240, w: 130, h: 20, isMoving: true, minX: 620, maxX: 780, vx: 1.5 },
+                    { x: 1500, y: 240, w: 130, h: 20, isMoving: true, minX: 1460, maxX: 1620, vx: 1.6 }
                 ],
                 bones: [
-                    { x: 310, y: 180, taken: false },
-                    { x: 880, y: 190, taken: false },
-                    { x: 1360, y: 180, taken: false },
-                    { x: 1780, y: 240, taken: false },
-                    { x: 2560, y: 250, taken: false }
+                    { x: 310, y: 210, taken: false },
+                    { x: 880, y: 230, taken: false },
+                    { x: 1360, y: 220, taken: false },
+                    { x: 1780, y: 270, taken: false },
+                    { x: 2560, y: 270, taken: false }
                 ],
                 clouds: [
                     { x: 100, y: 375, minX: 20, maxX: 200, vx: 1.8, hp: 2, maxHp: 2, w: 50, h: 32 },
@@ -371,7 +371,7 @@
                 this.vy = 0;
                 this.speed = 4.2;
                 this.gravity = 0.55;
-                this.jumpPower = -11.5;
+                this.jumpPower = -12.5; // Potencia de salto optimizada
                 this.isGrounded = false;
                 this.facingRight = true;
                 this.invulnerableTimer = 0;
